@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mi Pictionari Oline</title>
+  <link rel="stylesheet" type="text/css" href="bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="miestilo.css">
+</head>
+<body>
+  <div id="app">
+    <nav id="navegacion" class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#" @click="cambiarVista('jugar')">Jugar</a>
+      <a class="navbar-brand" href="#" @click="cambiarVista('cargar')">Cargar</a>
+      <a class="navbar-brand" href="#" @click="cambiarVista('buscar')">Buscar</a>
+      <a class="navbar-brand" href="#" @click="cambiarVista('exportar')">exportar</a>
+
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <h4 class="navbar-toggler-icon"></h4>
+      </button>
+
+      <!--div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#" @click="cambiarVista('cargar')">Cargar<h4 class="sr-only">(current)</h4></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" @click="cambiarVista('buscar')">Buscar</a>
+          </li>
+        </ul>
+      </div-->
+    </nav>
+
+    <!--Mensaje-->
+    <transition name="bounce">
+      <div id="alerta" class="alert" :class="tipomensaje" v-if="boleanmensaje">
+        <strong>{{fuerte}}</strong>{{mensaje}}
+      </div>
+    </transition>
+
+    <!--exportar-->
+      <transition name="fade" mode="out-in">
+        <div v-show="vista == 'exportar'" class="vista vexportar row">
+          <div v-if="!palabras.length" class="col-md-12">
+            <h4>Exportar:</h4>
+            <h5>No se encontraron datos para exportar</h5>
+            <hr>
+          </div>
+          
+          <div v-else class="col">
+            <div class="form-group txtcontenedor">
+              <h4>Exportar:</h4>
+              <label>Copie el contenido del cuadro y guardelo en algun archivo de texto</label>
+              <button class="btn btn-primary form-group" @click="exportar">Copiar al portapapeles</button>
+              <textarea class="form-control" rows="21" id="txtexporat" readonly>{{contenidoAexportar}}</textarea>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group txtcontenedor">
+              <h4>Importar:</h4>
+              <h6><input type="radio" value="reemplazar" name="tipoImportacion" v-model="importacion"> Reemplazar contenido existente</h6>
+              <h6><input type="radio" value="agregar" name="tipoImportacion" v-model="importacion"> Agregar al contenido actual</h6>
+              <label for="comment">Pegue aqui el texto a importar:</label>
+              <button class="btn btn-primary form-group" @click="importar">Importar!</button>
+              <textarea class="form-control" rows="21" id="textimport"></textarea>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+    <!--buscar-->
+      <transition name="fade" mode="out-in">
+        <div v-show="vista == 'buscar'" class="vista vbuscar">  
+          
+          <input class="form-control form-group" type="text" placeholder="Filtrar" v-model="filtro">
+          
+          <h3 v-if="!palabras.length">No hay palabras</h3>
+          <div v-else class="row">
+            <h3 v-if="!palabrasFiltradas.length">Ningun contacto coincide con la busqueda</h3>
+            <div  v-for="(palabra,indice) in palabrasFiltradas" class="col-md-4 form-group">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">{{ palabra.palabra }}</h4>
+                  <hr>
+                  <p class="card-text">Pelicula: {{palabra.pelicula}}</p>
+                  <p class="card-text">Categoria: {{palabra.categoria}}</p>
+                  <p class="card-text">Palabras Claves:</p>
+                      <p v-for="claves in palabra.palabrasClaves">|{{claves}}|</p>
+                  <a href="#" class="btn btn-primary" @click="eliminarpalabra(indice)"> Eliminar</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <transition name="fade" mode="out-in">
+        <div v-show="vista == 'cargar'" class="vista">
+          <div class="vingresar row">
+            <div class="col-md-12">
+              <h3>Bienvenido a Mi Pictionari online</h3>
+              <p>En esta seccion podra agregar palabras a su pictionari</p>
+            </div>
+
+            <div class="col-md-12 form-group">
+              <h5>Palabra</h5>
+              <input class="form-control" v-model="palabra.palabra" type="text" placeholder="Ingrese palabra">
+              <transition name="slide-fade">
+                <label v-show="!palabraOK&&palabra.palabra!=''" class="aviso">La palabra debe tener 3 caracteres como minimo y al menos una letra</label>  
+              </transition>
+              
+            </div>
+
+            <div class="col-md-12 form-group">
+              <h5>Pelicula</h5>
+              <input class="form-control" v-model="palabra.pelicula" type="text" placeholder="Ingrese la pelicula">
+              
+            </div>
+
+            <div class="col-md-12 form-group">
+              <h5>Categoria</h5>
+              <span class="radio-inline"><input value="facil" id="radio1" name="radio" type="radio" v-model="palabra.categoria"> Facil</span>
+              <span class="radio-inline"><input value="dificil" id="radio2" name="radio" type="radio" v-model="palabra.categoria"> Dificil</span>
+            </div>
+            
+            <div class="col-md-12 form-group">
+              <h5>Palabras Claves</h5>
+              <input class="form-control form-group" v-model="clave" type="text" placeholder="Ingrese palabra clave">
+              <button class="btn btn-primary" type="submit" @click="agregarPalabraClave">Agregar Palabra Clave</button>
+              <h5 v-for="claves in palabra.palabrasClaves">{{claves}}</h5>
+            </div>
+
+            <div class="col">
+              <button class="btn btn-primary" :disabled="!formOk" type="submit" @click="agregarPalabra">Agregar Palabra</button>
+            </div>
+            
+          </div>
+        </div>
+      </transition>
+
+<transition name="fade" mode="out-in">
+        <div v-show="vista == 'jugar'" class="vista">
+          <div class="vingresar row">
+            <div class="col-md-12">
+              <h3>Bienvenido a Mi Pictionari online</h3>
+              <p></p>
+            </div>
+
+            <div v-show="inGame" class="col-md-12 form-group">
+              <h3>Palabra: {{palabraEnJuego.palabra}}</h3>
+              <h4>Categoria: {{palabraEnJuego.categoria}}</h4>
+              <h5>Pelicula: {{palabraEnJuego.pelicula}}</h5>
+              <h5>Palabras claves: {{palabraEnJuego.palabrasClaves}}</h5>
+            </div>
+
+            <div class="col-md-12 form-group">
+              <button v-show="palabrasJuego.length!=0" class="btn btn-primary" type="submit" @click="getPalabra">Dame una palabra</button>
+              <button class="btn btn-primary" type="submit" @click="reiniciarJuego">Juego Nuevo</button>
+            </div>
+            <p v-show="inGame">{{palabrasJugadas}}</p>
+          </div>
+        </div>
+      </transition>
+  </div>	
+  <script src="vue.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
