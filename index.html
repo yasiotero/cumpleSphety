@@ -155,7 +155,7 @@
 
             <div class="col-md-12 form-group">
               <button v-show="palabrasJuego.length!=0" class="btn btn-primary" type="submit" @click="getPalabra">Dame una palabra</button>
-              <button class="btn btn-primary" type="submit" @click="reiniciarJuego">Juego Nuevo</button>
+              <button v-show="palabras.length!=0" class="btn btn-primary" type="submit" @click="reiniciarJuego">Juego Nuevo</button>
             </div>
             <p v-show="inGame">{{palabrasJugadas}}</p>
           </div>

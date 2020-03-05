@@ -136,12 +136,19 @@ var vm= new Vue({
       if (localStorage.getItem("datos")) {
         this.palabras=JSON.parse(localStorage.getItem("datos"))
       }
+      else{
+        localStorage.setItem("datos", JSON.stringify([]))
+      }
       if (localStorage.getItem("juego")) {
         this.palabrasJuego=JSON.parse(localStorage.getItem("juego"))
+      }else{
+        localStorage.setItem("juego", JSON.stringify([]))
       }
       if (localStorage.getItem("pj")) {
         this.palabraEnJuego=JSON.parse(localStorage.getItem("pj"))
         inGame=true
+      }else{
+        localStorage.setItem("pj", JSON.stringify({}))
       }
   }
 })
